@@ -3,7 +3,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Forex extends CI_Controller {
 	public $param;	
-	public function activation($kode='null'){
+	
+	public function deposit_value()	
+	{
+		$def=14000;
+		$res=$this->forex->rateNow('deposit');
+		if(isset($res['value'])){
+			$def=$res['value'];
+		}else{}
+		echo $def;
+	}
+	
+	public function activation($kode='null')
+	{
 		$this->param['title']='OPEN LIVE ACCOUNT ACTIVATION'; 
 		$this->param['content']=array(  );
 		 
@@ -20,7 +32,7 @@ class Forex extends CI_Controller {
 			if(!isset($res)&&!isset($row['id'])){
 				
 				logCreate('forex code not valid code:'.$kode,'error');
-				$this->param['content'][]= 'activationError' ;
+				$this->param['content'][]= 'data/activationError' ;
 				$res=true;
 			}
 			
@@ -32,11 +44,11 @@ class Forex extends CI_Controller {
 			}
 		}else{		
 			$this->param['post']=$_POST;
-			$this->param['content'][]= 'activationData' ;
+			$this->param['content'][]= 'data/activation' ;
 		}
 		$this->showView();
 	}
-	
+/*	
 	public function sendmail(){
 		if(defined('LOCAL')){
 			echo 'no email send';
@@ -44,29 +56,46 @@ class Forex extends CI_Controller {
 			mail("gundambison@gmail.com","test","----this is a test----");
 		}
 	}
-	public function fake($status='none'){ 
+	
+	public function fake($status='none')
+	{ 
+		if($this->input->get('privatekey')!=$this->forex->forexKey()){
+			$message="there is nothing to see but us tree";
+			$this->errorMessage('341',$message);
+		}
+		
 		if(defined('LOCAL')){
 			if($status=='none'){
-				$res= "1;11001724"; 
-				
+				$res=array(
+					'responsecode'=>0,
+					'accountid'=>'9'.date("Ymdhis"),
+					'masterpassword'=>date("his"),
+					'investorpassword'=>date("dmy"),
+				);//$res= "1;11001724"; 
+				 
 			}
 			
 			if($status=='activation'){
 				$res="1";
 			}
-			//
+			if($status=='update'){
+				$res="0";
+			}
+			$raw=array();
 			if(!isset($res)){ 
 				$res='1;11001724';
 				//echo $raw."<br/>".base64_encode($raw);
 				//MTsxMTAwMTcyNA==
+				
 				$id=$this->forex->accountActivation(5,$raw);
 				$res.="id:$id";
 			}
-			echo $res;
+			$this->succesMessage($res);
 		}else{ 
 			echo "no respond";
 		}
 	}
+
 	public function runApi(){
 		$url=$this->config->item('api_url');		
 		$param['app_code']='9912310';
@@ -76,7 +105,7 @@ class Forex extends CI_Controller {
 		echo 'run:'.$url.'<pre>';
 		var_dump($result);
 	}
-	
+*/	
 	public function listUser()
 	{
 		$this->param['title']='OPEN LIVE ACCOUNT'; 
@@ -130,7 +159,7 @@ class Forex extends CI_Controller {
 			//$respon['html']=$this->load->view($this->param['folder'].'liveTable_view',$this->param,true);
 			*/
 			if($stat!==false){
-				$respon['html']="<h3>berhasil</h3> Silakan Menunggu Konfirmasi dari Email anda";
+				$respon['html']="Silakan Menunggu Konfirmasi dari Email anda";
 				$ok=1;
 				$url=$this->config->item('api_url');		
 				$param['app_code']=$this->config->item('app_code')[0];
@@ -215,6 +244,7 @@ class Forex extends CI_Controller {
 			$json['data']=$data;
 		
 		echo json_encode($json);
+		logCreate($json,"error");
 		
 		exit();
 	}

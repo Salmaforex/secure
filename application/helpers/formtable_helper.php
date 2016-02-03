@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 hanya generator
 */
 if ( ! function_exists('bsInput')){
-	function bsInput($title,$name, $value='',$info=''){
+	function bsInput($title,$name, $value='',$info='',$disable=false){
 		if($info=='')$info='please input correct data';
 		$data = array(
 			'name'          => $name,
@@ -14,8 +14,15 @@ if ( ! function_exists('bsInput')){
 			'type'			=> 'text',
 			'placeholder'	=> $info
 		);
-
-		$inp= form_input($data); 
+		if($disable!==false){
+			$inp=$value; 
+			//var_dump($disable);
+		}
+		else{
+			$inp= form_input($data);
+		}
+		
+		//$inp= form_input($data); 
 		$str='<tr><td><label for="input_'.$name.'">'.$title.'</label></td><td>&nbsp;</td>
 		<td><div class="form-group">'.$inp.'</div></td></tr>';
 	return $str;

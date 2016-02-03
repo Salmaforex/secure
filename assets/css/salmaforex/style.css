@@ -76,3 +76,12 @@ div.wpcf7 div.ajax-error {
 div.wpcf7 .placeheld {
 	color: #888;
 }
+.notice{
+	border: 2px solid #E0E0EA;
+	padding: 30px;
+	border-radius: 20px;
+	width: 600px;
+	margin: 0px auto 30px;
+	background-color: rgba(234, 252, 237, 0.5);
+	font-size:110%;
+}
