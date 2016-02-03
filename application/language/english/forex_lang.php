@@ -30,4 +30,17 @@ $lang['forex_code_used']='Code Has been Use';
 
 $lang['forex_activation_account_active']='Account Has Been Active';
 $lang['forex_expired']='Code Has Been Expired';
+
+//================API
+$lang['resApi_0']='Success';
+$lang['resApi_1']='Invalid private key';
+$lang['resApi_2']='Internal Error';
+$lang['resApi_3']='Account is not exist';
+$lang['resApi_4']='Account and group not match';
+$lang['resApi_5']='Agent account is not exist';
+$lang['resApi_6']='Agent account and group not match';
+$lang['resApi_7']='Parameter are required';
+$lang['resApi_8']='This request is processing';
+$lang['resApi_unknown']='This respon not defined';
+
 ?>

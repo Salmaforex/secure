@@ -55,7 +55,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-//	define('LOCAL',1); //hapus jika bukan di lokal
+	define('_DEV_',1); //hapus jika bukan Development
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING

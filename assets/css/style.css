@@ -368,3 +368,26 @@ html .frame-form-basic h2{
 #input_phone{
 	width:70% !important;
 }
+
+.col-md-8{
+	margin:auto;
+	min-width:610px;
+	width:650px;
+}
+
+.panel-body .form-group{
+	width:200px;float:left;padding:10px;
+}
+.submitLogin{
+	height: 60px;
+	width: 120px;
+	font-size:20px !important;
+}
+
+#frmLiveAccount .panel{
+	background: #0E5AF2;
+	color: white;
+	padding: 20px;
+	border-radius: 15px;
+	box-shadow: 10px 10px grey;
+}

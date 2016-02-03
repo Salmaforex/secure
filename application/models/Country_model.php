@@ -44,8 +44,9 @@ public $table='mujur_country';
 	function getData($id,$field='country_id')
 	{
 		$sql="select 
-		 `country_id` id,  `country_code` code,  `country_name` name,  `country_created` created,  `country_modified` modified 
+		 `country_id` id,  `country_code` code,  `country_name` name
 		from {$this->table} where {$field}='$id'";
+		//,  `country_created` created,  `country_modified` modified 
 		if($field=='country_id'){
 			$data=dbFetchOne($sql);
 		}else{ 

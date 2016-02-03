@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');?>
                 <div id="top-bar-background">
                     <div class="container relative">
                                                 <div id="top-bar-text" class="top-bar-sides abs-right">
-                            <a href="http://www.salmaforex.com/open-account-live/" target="_blank" block="0" lightbox="0" title="Live Account" font="" color="29a4dd"><img class="ui--icon" src="<?=base_url();?>assets/img/open-account.png" alt="" data-at2x="size:14px" data-retina-auto="1" style="margin-right: 5px;">Live Account </a>
+                            <a href="<?=base_url("login");?>" target="_blank" block="0" lightbox="0" title="Live Account" font="" color="29a4dd"><img class="ui--icon" src="<?=base_url();?>assets/img/open-account.png" alt="" data-at2x="size:14px" data-retina-auto="1" style="margin-right: 5px;">Login </a>
 <div class="helper--seperator"></div>
 <a href="http://www.salmaforex.com/deposit-form/" target="_blank" block="0" lightbox="0" title="Demo Account" font="" color="29a4dd"><img class="ui--icon" src="<?=base_url();?>assets/img/partners.png" alt="" data-at2x="size:14px" data-retina-auto="1" style="margin-right: 5px;"> Deposit</a>
 <div class="helper--seperator"></div>
