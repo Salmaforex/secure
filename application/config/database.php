@@ -8,9 +8,9 @@ if(defined('LOCAL')){
 	$db['default'] = array(
 		'dsn'	=> '',
 		'hostname' => 'localhost',
-		'username' => 'root',
-		'password' => '',
-		'database' => 'mujur_forex',
+		'username' => 'mujur_forex',
+		'password' => 'v5aKFPRKDFxhV6A4',
+		'database' => 'mujur_forex2016',
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => FALSE,

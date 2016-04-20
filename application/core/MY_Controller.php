@@ -1,22 +1,21 @@
 <?php 
-
+defined('BASEPATH') OR exit('No direct script access allowed');
  class MY_Controller extends CI_Controller {
 	function __CONSTRUCT(){
 		parent::__construct(); 
 		$this->load->library('session');
 	}
+//---------Tidak diketahui kegunaannya?	
 	public function runApi(){
 		$url=$this->config->item('api_url');		
 		$param['app_code']='9912310';
 		$param['module']='forex';
 		$param['task']='register';
 		$result=_runApi($url, $param);
-		//echo 'run:'.$url.'<pre>';
-		//var_dump($result);
+ 
 	} 
 	
-	public function data()
-	{
+	public function data(){
 		$url=$this->config->item('api_url');
 		$this->load->helper('api');
 		$respon=array(		
@@ -49,7 +48,7 @@
 			}
 			else{
 				logCreate("unknown :".htmlentities($raw));
-				$this->errorMessage('267',$message);
+				$this->errorMessage('267',$raw,$message);
 			}
 		}
 		else{
@@ -63,19 +62,19 @@
 		$this->succesMessage($respon);
 	}
 	
-	protected function convertData()
-	{
+	protected function convertData(){
 	$post=array();
 		if(is_array($this->input->post('data'))){
 			foreach($this->input->post('data') as $data){
-				$post[$data['name']]=$data['value'];
+				if(isset($data['name'])){
+					$post[$data['name']]=$data['value'];
+				}
 			}
 		}else{}
 		return $post;
 	}
 	
-	public function api()
-	{		
+	public function api(){		
 		$module=$this->input->post('module');
 		$task=$this->input->post('task');
 		$appcode=$this->input->post('app_code');
@@ -83,8 +82,7 @@
 		if(array_search($appcode, $aAppcode)!==false){
 			$this->load->model('forex_model','modelku');
 			$param=$this->input->post('data');
-			$function= strtolower($module ).ucfirst(strtolower($task ));
-			//	$respon=$this->modelku->$function($param );
+			$function= strtolower($module ).ucfirst(strtolower($task )); 
 			$file='views/api/'.$function.'_data.php';
 			if(is_file($file)){
 				$res =$this->load->view('api/'.$function.'_data', $param,true);
@@ -107,8 +105,7 @@
 		}
 	}
 	
-	protected function succesMessage($respon)
-	{
+	protected function succesMessage($respon){
 		echo json_encode(
 		  array(
 			'status'=>true,
@@ -121,8 +118,7 @@
 		exit();	
 	}
 	
-	protected function errorMessage($code, $message,$data=array())
-	{
+	protected function errorMessage($code, $message,$data=array()){
 		$json=array(
 			'status'=>false,
 			'code'=>$code, 
@@ -138,30 +134,25 @@
 		exit();
 	}
 	 
-	protected function showView(){
+	protected function showView($target='newbase_view'){
 		$name=$this->uri->segment(2,'');		
 		if($name!=''){
 			$jsScript=$this->param['folder'].$this->uri->segment(2).".js";
 			$this->param['dataUrl']=  $this->uri->segment(1). "_".$name;
-			$this->param['script']=$this->param['type']=$name;
-			
-			//$this->param['openScript']=$jsScript;
-			//logCreate('open script:'.$jsScript.'|data:'. $this->uri->segment(1)."_".$name  );
+			$this->param['script']=$this->param['type']=$name; 
 			
 			if(isset($this->param['content'])&&!is_array($this->param['content'])){
 				$this->param['load_view']= 
 					$this->param['folder'].$this->param['content'].'_view';
 				
 			}else{}
-			//$this->checkView( $this->param['load_view'] );
+			 
 			
 		}else{ 
-			//$controller=$this->uri->segment(1);
-			//if($controller=='')$controller='forex';
-			//redirect(base_url().$controller."/index","refresh");	
+			 
 		}
 		 
-		$this->load->view('base_view', $this->param);
+		$this->load->view($target, $this->param);
 	
 	}
 	 

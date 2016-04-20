@@ -10,13 +10,15 @@ $lang['forex_inputpassword'] = 'Please use safety password';
 $lang['forex_dob']='Date of Birth';
 $lang['forex_country']='Country';
 
-$lang['forex_state']='State';
+$lang['forex_state']='Province';
 $lang['forex_city']='City';
 $lang['forex_zipcode']='Zip code';
 $lang['forex_address']='Address';
 
 $lang['forex_email']='Email';
 $lang['forex_phone']='Phone';
+$lang['forex_bank']='Bank Name';
+$lang['forex_bank_norek']='Account Number';
 
 $lang['forex_pass']='Access Password';
 $lang['forex_passconfirm']='Confirm Access Password';

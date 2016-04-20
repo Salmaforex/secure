@@ -49,11 +49,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'forex';
-$route['login'] = 'member/login';
+
+if(!defined('_DEV_')){	
+	$route['default_controller'] = 'forex';
+}
+else{ 
+	$route['default_controller'] = 'member/login';
+}
+
+$route['register/(:any)'] = 'forex/register/$1';
+//$route['login'] = 'login/member';
+$route['welcome'] = 'guest/home';
+
+$route['loginadmin'] = 'login/admin';
 $route['forgot_password'] = 'member/forgot';
 $route['deposit-form'] = 'member/deposit';
-$route['withdrawal-form'] = 'member/withdrawal';
+$route['widtdrawal-form'] = 'member/widtdrawal';
+$route['withdraw-form'] = 'member/withdrawal';
 $route['rupiah_deposit'] = 'forex/deposit_value';
-$route['404_override'] = '';
+$route['rupiah_widtdrawal'] = 'forex/widtdrawal_value';
+$route['recover/(:any)'] = "member/recover/$1";
+$route['404_override'] = 'forex/error404';
 $route['translate_uri_dashes'] = FALSE;

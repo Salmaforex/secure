@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Country_model extends CI_Model {
-public $table='mujur_country'; 
+public $table='sfor_country'; 
         public function __construct()
         {
             $this->load->database();
@@ -11,7 +11,7 @@ public $table='mujur_country';
 	{
 		$sql="select 
 		 `country_id` id from {$this->table}";
-		return dbFetch($sql);//$this->db->query($sql)->result_array();
+		return dbFetch($sql); 
 	}
 /*	
 	If not valid, Create New

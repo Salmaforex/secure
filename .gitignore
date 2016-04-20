@@ -4,3 +4,12 @@
 */cache/*
 */cache/!index.html
 */cache/!.htaccess
+application/views/old/*
+tmp/*
+cgi-bin/*
+logs/*
+new.komodoproject
+.htaccess
+LICENSE
+license.txt
+views/*

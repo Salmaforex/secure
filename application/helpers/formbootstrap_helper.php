@@ -20,9 +20,7 @@ if ( ! function_exists('bsInput')){
 		else{
 			$inp= form_input($data);
 		}
- 
-		
-//<input type="text" class="form-control" id="input_'.$name.'" placeholder="'.$info.'">
+  
 		$str='<div class="form-group">
     <label for="input_'.$name.'">'.$title.'</label>'.$inp.'</div>';
 	return $str;

@@ -1,7 +1,7 @@
 <?php 
 //logConfig
 $config['logConfig']=array(
-	'path'=>'logs/',
+	'path'=>'logs/'.date('Ym').'/',
 	'name'=>'%s.php',
 	'write'=>true,
 );

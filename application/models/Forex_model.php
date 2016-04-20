@@ -1,21 +1,50 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+if (   function_exists('logFile')){ logFile('model','forex_model.php','model'); };
 class Forex_model extends CI_Model {
-public $tableRegis='mujur_register'; 
-public $tableWorld='mujur_country'; 
-public $tableAccount='mujur_account';
-public $tableAccountDetail='mujur_accountdetail';
-public $tableActivation='mujur_activation';
-public $tablePassword='mujur_password';
-public $tableAdmin='mujur_admin';
-public $tablePrice='mujur_price';
-public $tableFlowlog='mujur_flowlog';
-public $tableAPI='mujur_api';
+public $tableRegis='sfor_register'; 
+public $tableWorld='sfor_country'; 
+public $tableAccount='sfor_account';
+public $tableAccountDetail='sfor_accountdetail';
+public $tableActivation='sfor_activation';
+public $tablePassword='sfor_password';
+public $tableAdmin='sfor_admin';
+public $tablePrice='sfor_price';
+public $tableFlowlog='sfor_flowlog';
+public $tableAPI='sfor_api';
+public $tableApi='sfor_api';
 public $url="http://localhost/forex/fake";
 public $demo=1; 
 
-public $emailAdmin='admin@secure.salmaforex.com';
-
+public $emailAdmin='admin@dev.salmaforex.com';
+/***
+Daftar Fungsi Yang Tersedia :
+*	emailAdmin($name='default')
+*	forexUrl($name='default')
+*	forexKey()
+*	flowInsert($type='',$data=array() )
+*	rateUpdate($raw)
+*	rateNow($types='')
+*	accountRecover($detail=false)
+*	accountCreate($id,$raw='')
+*	accountDetail($id,$field='id')
+*	accountDetailRepair($data=array())
+*	accountActivation($id,$raw0)
+*	activationDetail($id,$field='id')
+*	activationUpdate($id, $status)
+*	activationUpdateUser($id, $status)
+*	regisAll($limit=10,$where="")
+*	regisDetail($id,$stat=false)
+*	regisDelete($email,$status=-1)
+*	saveData($data, &$message)
+*	__construct()
+***/
+	function emailAdmin($name='default'){
+		$url=$aAppcode=$this->config->item('emailAdmin');
+		
+		$this->emailAdmin=isset($url)?$url:false;
+	}
+	
 	function forexUrl($name='default'){
 		$url=$aAppcode=$this->config->item('urlForex');
 		
@@ -46,7 +75,14 @@ public $emailAdmin='admin@secure.salmaforex.com';
 				logConfig("create table:$str");
 				$this->db->reset_query();	
 				 
-			}
+		}
+		$sql="select * from {$this->tableFlowlog} limit 1";
+		$row=$this->db->query($sql)->row_array();
+		if(!isset($row['status'])){
+			$sql="ALTER TABLE `{$this->tableFlowlog}` ADD `status` tinyint default 0;";
+				dbQuery($sql,1);			
+		}
+		
 		if($type=='')return false;
 		$dt=array('types'=>$type);
 		$dt['param']=json_encode($data);
@@ -72,7 +108,7 @@ public $emailAdmin='admin@secure.salmaforex.com';
 	}
 
 	function rateNow($types=''){
-//==========Menambah mujur_price
+//==========Menambah sfor_price
 			if(!$this->db->table_exists($this->tablePrice)){
 				$fields = array(
 				  'id'=>array( 
@@ -89,35 +125,51 @@ public $emailAdmin='admin@secure.salmaforex.com';
 				$str = $this->db->last_query();			 
 				logConfig("create table:$str");
 				$this->db->reset_query();	
-				$this->db->insert('mujur_price', 
+				$this->db->insert('sfor_price', 
 					array('types'=>'deposit', 'price'=>14000));
-				$this->db->insert('mujur_price', 
+				$this->db->insert('sfor_price', 
 					array('types'=>'widtdrawal', 'price'=>13500));
 			}
 			
 		$types=addslashes($types);
 		$row= $this->db	
-		->query('select price `value` from mujur_price where types="'.$types.'" order by created desc limit 1')
-		->row_array();
-		return $row['value'];
+		->query('select price `value` from sfor_price where types="'.$types.'" order by created desc limit 1')
+		->row_array(); 
+		return $row ;
 	}
 /***
-ACCOUNT
+ACCOUNT 
+SEMUA dipindah ke model ACCOUNT
 ***/	 
+	function accountRecover($detail=false){
+		if($detail==false){
+			
+			return true;
+		}
+	}
+	
 	function accountCreate($id,$raw='')
 	{
-		$detail=$this->regisDetail($id);
+		$reg_id=$id;
+		$detail=$this->regisDetail( $reg_id );
 		if(defined('LOCAL')){
 		$sql="select count(id) c from {$this->tableAccount} where username like '{$detail['username']}'";
 			$row=dbFetchOne($sql);
 			if($row['c']!=0){
+				logCreate("hapus username : {$detail['username']}");
 				$sql="delete from {$this->tableAccount} where username like '{$detail['username']}'";
+				dbQuery($sql,1);
+				$sql="delete from {$this->tableAccount} where reg_id = '{$reg_id}'";
 				dbQuery($sql,1);
 				$sql="delete from {$this->tableAccountDetail} where username like '{$detail['username']}'";
 				dbQuery($sql,1);
 			}
 		}
-
+		logCreate("register id:$id |detail:".print_r($detail,1));
+		if(!isset($detail['detail']['statusMember']))
+			$detail['detail']['statusMember']='MEMBER';
+		logCreate("register id:$id |raw:".print_r($raw,1));
+		
 		$dt=array(
 			'reg_id'=>$id,
 			'username'=>$detail['username'],
@@ -125,6 +177,7 @@ ACCOUNT
 			'masterpassword'=>trim($raw['masterpassword']),
 			'accountid'=>$raw['accountid'],
 			'email'=>$detail['email'],
+			'type'=>strtoupper($detail['detail']['statusMember']),
 			//'raw'=>$raw,
 			//'activation'=>base64_encode($raw),
 			'created'=>date("Y-m-d")
@@ -135,44 +188,71 @@ ACCOUNT
 		if($dt2['max'] > (int)$accid){
 			$accid=$dt2['max'];
 		}
-		$dt['id']=$accid+1;
-		
+		$dt['id']=$acc_id=$accid+1;
+		$sql="select count(id) tot from {$this->tableAccount} where reg_id='$reg_id'";
+		$rawAccount=dbFetchOne($sql);
+	//apabila ada reg_id yang sama maka cancel	
+		if($rawAccount['tot']!=0){
+			logCreate("register not continue account exist:".json_encode($rawAccount));
+			return false;
+		}
 		$sql=$this->db->insert_string($this->tableAccount,$dt);
 		dbQuery($sql,1);
+		$dataRaw = $this->account->detail($raw['accountid'],'accountid');
+		$dataRaw = $this->account->detail($acc_id);
+		
 //===========Account Detail  
 		$dt=array(
 			'id'=>$accid,
-			'username'=>$detail['username'],
-			'detail'=>json_encode($detail['detail']),
-			
+			'username'=>$dataRaw['accountid'],
+			'detail'=>json_encode($detail['detail']), 
 		);
-		$sql=$this->db->insert_string($this->tableAccountDetail,$dt);
 		
-		$sql="select id from {$this->tableActivation} where userid=$id";
+		logCreate("hapus detail sebelumnya:". $dataRaw['accountid']);
+		$sql="delete from $this->tableAccountDetail where username like '{$dataRaw['accountid']}'";
+		dbQuery($sql,0);
+		
+		$sql=$this->db->insert_string($this->tableAccountDetail, $dt);
+		
+		$sql="select id from {$this->tableActivation} where userid=$id and status!=1";
 		$data=dbFetch($sql);
+		logCreate('Close Old Activation:'.json_encode($data) );
 		foreach($data as $row){
 			$idActive=$row['id'];
 			$this->activationUpdate($idActive, 1); //close activation
 		}
-		
+		logCreate('Close Activation');
 		$data = array('reg_status' => 0);
 		$where = "reg_id=$id";
 		$sql = $this->db->update_string($this->tableRegis, $data, $where);
 		dbQuery($sql,1);
-		//===============Change Password===============
+		//===========UPDATE ACCOUNT
+		//===============Change Password===============		
 		$sql="select password from {$this->tablePassword} order by rand() limit 2";
 		$data=dbFetch($sql);
+		logCreate('change password :'.json_encode($data));
 		$invPass=$data[0]['password'];
 		$masterPass=$data[1]['password'];
 		
 		$param=array( );
 		$param['privatekey']	=$this->forex->forexKey();
-		$param['accountid']=$raw['accountid'];
+		$param['accountid']=(int)$raw['accountid'];
 		$param['masterpassword']=$masterPass.($raw['accountid']%100000 +19939);
-		$param['investorpassword']=$invPass.($raw['accountid'] %100000 +19919) ; 
+		$param['investorpassword']=$invPass.($raw['accountid'] %100000 +19919);
+		$param['allowlogin']=1;
+		$param['allowtrading']=1;
+		
+		$param['username']=isset($detail['detail']['firstname'])&&isset($detail['detail']['lastname'])?utf8_encode("{$detail['detail']['firstname']} {$detail['detail']['lastname']}"):"";
+		
+		$param['address']=isset($detail['detail']['address'])?$detail['detail']['address']:"";
+		$param['country']=isset($detail['detail']['country']['name'])?$detail['detail']['country']['name']:"";
+		$param['zipcode']=isset($detail['detail']['zipcode'])?$detail['detail']['zipcode']:"";
+		$param['phone']=  isset($detail['detail']['phone'])?$detail['detail']['phone']:"";
+		$param['email']=  isset($detail['email'])?$detail['email']:"";
 		
 		$url=$this->forex->forexUrl('update');
 		$url.="?".http_build_query($param);
+		logCreate("update password param:".print_r($param,1)."|url:$url");
 		$arr['param']=$param;
 		$arr['url']=$url;
 		$result0= _runApi($url );
@@ -181,35 +261,41 @@ ACCOUNT
 			'investorpassword' => md5( $param['investorpassword'] ),
 			'masterpassword'=>md5( $param['masterpassword'] )
 		);
-		$where = "reg_id=$id";
+		$where = "accountid='{$raw['accountid']}'";
 		
 		$sql = $this->db->update_string($this->tableAccount, $data, $where);
 		dbQuery($sql,1);
 		
 		$param2=array( 
-			'username'=>$detail['username'],
+			'username'=>$raw['accountid'],
 			'masterpassword'=>$param['masterpassword'],
 			'investorpassword'=>$param['investorpassword'],
 			'email'=>$detail['email']
 		);
 		$param2['emailAdmin']=$this->emailAdmin;
-			
+		$param2['accountType']=$detail['detail']['statusMember'];	
 		$this->load->view('member/email/emailRegister_view',$param2);
 		
 	}
 
 	function accountDetail($id,$field='id'){
-		$id=addslashes($id);
-		$sql="select count(id) c from {$this->tableAccount}
-		where `{$field}`='$id'";
-		$res=dbFetchOne($sql);
-		if($res['c']==0)
-			return false;
+		//$id=addslashes($id);
+		logCreate("accountDetail id:$id|field:$field");
 		
-		$sql="select a.* from {$this->tableAccount} a  
+		$id=addslashes(trim($id));
+		if($field=='email')$id.="%";
 		
-		where `{$field}`='$id'";
+		$sql="select count(id) c from `{$this->tableAccount}`  where `{$field}` like '{$id}';"; 
 		$res=dbFetchOne($sql);
+		if($res['c']==0){
+			logCreate("accountDetail id:$id|field:$field | not found");
+			return false; 
+			//$sql.print_r($res,1) ;
+		}
+		
+		$sql="select a.* from {$this->tableAccount} a  		
+		where `{$field}` like '$id'";
+		$res=dbFetchOne($sql);		
 		$this->accountDetailRepair($res);
 			
 		$sql="select a.*,ad.detail raw,adm.adm_type type from {$this->tableAccount} a 
@@ -217,14 +303,16 @@ ACCOUNT
 			on a.username like ad.username
 		left join {$this->tableAdmin} adm 
 			on adm_username like a.username
-		where a.`{$field}`='$id'";
+		where a.`{$field}` like '$id'";
 		$data= dbFetchOne($sql);
 		if($data['type']==7){
 			$data['type']='admin';
 		}else{
 			$data['type']=false;
 		}
-		$data['detail']=json_decode($data['raw'],true); 
+		if(isset($data['raw'])){
+			$data['detail']=json_decode($data['raw'],true); 
+		}
 		unset($data['raw']);
 		return $data;
 	}
@@ -233,21 +321,24 @@ ACCOUNT
 		$username=$data['username'];
 		$sql="select count(id) c  from {$this->tableAccountDetail} where `username`='$username'";
 		$res=dbFetchOne($sql);
-		if($res['c']==1)
+		if($res['c']==1){
 			return true;
+		}
 		
-		$reg=$this->regisDetail($data['reg_id']);
-		$detail=json_encode($reg['detail']);
-		$sql="insert into {$this->tableAccountDetail}(username,detail) values('$username','$detail')";
-		dbQuery($sql);
+		if($data['reg_id']!=0){
+			//logCreate("account detail id:$id|field:$field create Detail");
+			$reg=$this->regisDetail($data['reg_id']);
+			$detail=json_encode($reg['detail']);
+			$sql="insert into {$this->tableAccountDetail}(username,detail) values('$username','$detail')";
+			dbQuery($sql);
+		}else{}
 		return true;
 	}
 /***
-ACTIVATION
-
+ACTIVATION 
 ***/	
 	function accountActivation($id,$raw0){
-		logCreate('create :'.$id." raw:".print_r($raw0,1));
+		logCreate('create activation :'.$id." raw:".print_r($raw0,1));
 		
 		$sql="select reg_id id from {$this->tableRegis} where reg_id like '$id'";
 		$row= $this->db->query($sql)->row_array();
@@ -306,10 +397,10 @@ ACTIVATION
 
 /***
 REGISTER
-***/	
-	function regisAll($limit=10)
-	{
-		$sql="select reg_id id from {$this->tableRegis} order by reg_id desc limit $limit";
+***/
+	function regisAll($limit=10,$where="")
+	{		
+		$sql="select reg_id id from {$this->tableRegis} $where order by reg_id desc limit $limit";
 		return  dbFetch($sql);//$this->db->query($sql)->result_array();
 	}
 	
@@ -354,7 +445,15 @@ REGISTER
 		
 		return $res;
 	}
-		
+	
+	function regisDelete($email,$status=-1){
+		$email=trim($email);
+		if($email!='')$email.='%';
+		logCreate("delete regis by email:$email ");
+		$sql="update `{$this->tableRegis}` set reg_status='$status' where  `reg_email` like '{$email}'";
+		dbQuery($sql,1);
+	}
+	
 	function saveData($data, &$message)
 	{
 		if(isset($data['agent'])){
@@ -368,14 +467,22 @@ REGISTER
 			$message='No email';
 			return false;
 		}
-		
+/*
 		$sql="select count(reg_id) c from {$this->tableRegis} where
-		reg_email='$email'";
+		reg_email like '$email'";
 		$res= $this->db->query($sql)->row_array();
 		if($res['c']!=0){
-			$message='Email already register';//.json_encode($res);
+			$message='Email already register';
 			return false;
 		}
+*/
+		$reg_id=date("ym0000");
+		$sql="select max(reg_id) max from {$this->tableRegis}";
+		$dt2=dbFetchOne($sql);
+		if($dt2['max'] >= (int)$reg_id){
+			$reg_id=$dt2['max']+3;
+		}
+		
 		unset($data['type']);
 		$dt=array(
 			'reg_status'=>1,
@@ -383,11 +490,14 @@ REGISTER
 			'reg_agent'=>$agent,
 			'reg_created'=>date("Y-m-d H:i:s"),
 			'reg_email'=>$email,
+			'reg_id'=>$reg_id,
+			'reg_username'=>!isset($data['firstname'])?'salmaforex':trim( $data['firstname'] )
 		);
 		$sql=$this->db->insert_string($this->tableRegis, $dt);
 		dbQuery($sql);
 		$message='Your account successfull registered';
 		return true;
+		
 	}
 //=====================================
 		public function __construct()
@@ -405,7 +515,7 @@ REGISTER
 			$dt=dbFetchOne($sql);
 			if(!isset($dt['reg_investorpassword'])){
 				$sql="ALTER TABLE `{$this->tableRegis}` ADD `reg_investorpassword` VARCHAR(100) NOT NULL AFTER `reg_password`;";
-				dbQuery($sql,1);			
+				dbQuery($sql,1);
 			}
 //=========UPDATE ACCOUNT			
 			$sql="select count(id) tot from {$this->tableAccount}";
@@ -425,8 +535,13 @@ REGISTER
 				$sql="ALTER TABLE `{$this->tableAccount}` CHANGE `username` `username` VARCHAR(50) NOT NULL;";
 				dbQuery($sql,1);				
 			}
-			if(!isset($dt['accountid'])){
-				echo '<pre>';var_dump($dt);
+			if(!isset($dt['type'])){ 
+				$sql="ALTER TABLE `{$this->tableAccount}` ADD `type` varchar(20) 
+				NOT NULL 
+				DEFAULT 'MEMBER';";
+				dbQuery($sql,1);
+			}
+			if(!isset($dt['accountid'])){ 
 				$sql="ALTER TABLE `{$this->tableAccount}` ADD `accountid` bigint NOT NULL DEFAULT '1';";
 				dbQuery($sql,1);
 			}
@@ -448,8 +563,8 @@ REGISTER
 				logConfig("create table:$str");
 				$this->db->reset_query();	
 			}
-//==========Menambah mujur_api
-			if(!$this->db->table_exists('mujur_api')){
+//==========Menambah sfor_api
+			if(!$this->db->table_exists('sfor_api')){
 				$fields = array(
 				  'id'=>array( 
 					'type' => 'BIGINT','auto_increment' => TRUE), 		   
@@ -463,7 +578,7 @@ REGISTER
 				);
 				$this->dbforge->add_field($fields);
 				$this->dbforge->add_key('id', TRUE);
-				$this->dbforge->create_table('mujur_api',TRUE);
+				$this->dbforge->create_table('sfor_api',TRUE);
 				$str = $this->db->last_query();			 
 				logConfig("create table:$str");
 				$this->db->reset_query();	
@@ -471,5 +586,7 @@ REGISTER
 
 			$this->rateNow();
 			$this->flowInsert('');
+			$this->emailAdmin();
+			$this->accountRecover();
         }
 }

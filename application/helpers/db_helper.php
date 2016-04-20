@@ -45,16 +45,14 @@ if ( ! function_exists('dbId')){
 
 if ( ! function_exists('dbQuery')){
   function dbQuery($sql,$debug=0){
-	$CI =& get_instance();
-	//$params = $CI->config->item('logConfig');
+	$CI =& get_instance(); 
 	$query=$CI->db->query($sql);
 	if (!$query){
 		logCreate($CI->db->error(),'error');
 		logConfig('sql:'.$sql.'|error:'.print_r($CI->db->error(),1),'logDB','error');
 		return false;
 	}
-	else{
-		//$query = $CI->db->query($sql);
+	else{ 
 		if($debug==1){ 	
 			logCreate('sql:'.$sql.'|affected:'. $CI->db->affected_rows(),'query');			
 		}else{}

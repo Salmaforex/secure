@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 hanya generator
 */
 if ( ! function_exists('bsInput')){
-	function bsInput($title,$name, $value='',$info='',$disable=false){
+	function bsInput($title,$name, $value='',$info='',$disable=false,$show=true){
 		if($info=='')$info='please input correct data';
 		$data = array(
 			'name'          => $name,
@@ -15,21 +15,50 @@ if ( ! function_exists('bsInput')){
 			'placeholder'	=> $info
 		);
 		if($disable!==false){
-			$inp=$value; 
-			//var_dump($disable);
+			$inp=$value;  
 		}
 		else{
 			$inp= form_input($data);
 		}
-		
-		//$inp= form_input($data); 
-		$str='<tr><td><label for="input_'.$name.'">'.$title.'</label></td><td>&nbsp;</td>
+		$disp=$show==true?'':'display:none'; 
+		$str='<tr style="'.$disp.'"><td><label for="input_'.$name.'">'.$title.'</label></td><td>&nbsp;</td>
 		<td><div class="form-group">'.$inp.'</div></td></tr>';
 	return $str;
 	
 	}
 }else{}
 
+if ( ! function_exists('bsInput2')){
+	function bsInput2($title,$name, $value='',$info='',$disable=false,$show=true){
+		if($info=='')$info='please input correct data';
+		$data = array(
+			'name'          => $name,
+			'id'            => 'input_'.$name,
+			'value'         => $value,
+			'class'			=> 'form-control',
+			'type'			=> 'text',
+			'placeholder'	=> $info
+		);
+		if($disable!==false){
+			$inp=$value;  
+		}
+		else{
+			$inp= form_input($data);
+		}
+		$disp=$show==true?'':'display:none'; 
+		$str='<div class="form-group" style="'.$disp.'">
+                    <label for="input_'.$name.'" class="col-sm-2 control-label">'.$title.'</label>
+                    <div class="col-sm-10">
+                     '.$inp.'
+                    </div>
+                  </div>';
+		/*'<tr style="'.$disp.'"><td><label for="input_'.$name.'">'.$title.'</label></td><td>&nbsp;</td>
+		<td><div class="form-group">'.$inp.'</div></td></tr>';*/
+	return $str;
+	
+	}
+}else{}
+ 
 if ( ! function_exists('bsInputPass')){
 	function bsInputPass($title,$name, $value='',$info=''){
 		if($info=='')$info='please input correct data';
@@ -50,8 +79,7 @@ if ( ! function_exists('bsInputPass')){
 	
 	}
 }else{}
-
-
+ 
 if( ! function_exists('bsText')){
 	function bsText($title,$name, $value='',$rows=0,$cols=0){
 		$cols=$cols==0?60:$cols;
@@ -97,7 +125,9 @@ if( ! function_exists('bsButton')){
 		foreach($aData as $nm=>$val){
 			$oth.="\t$nm=\"".addslashes($val)."\"";
 		}
-	return sprintf($str, $typeButton,$classButton,$oth, $value);
-	
+	$inp= sprintf($str, $typeButton,$classButton,$oth, $value);
+	$str='<tr><td>&nbsp;</td><td>&nbsp;</td>
+		<td><div class="form-group">'.$inp.'</div></td></tr>';
+	return $str;
 	}
 }else{}

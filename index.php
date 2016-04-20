@@ -1,5 +1,13 @@
 <?php
+if($_SERVER['HTTP_HOST']=='advance.forex'){
+	define('LOCAL',1);
+	ini_set('session.save_path',  dirname($_SERVER['DOCUMENT_ROOT']) . '/../session/'  );
+}
+function logFile(){
+	return true;
+}
 	date_default_timezone_set('Asia/Jakarta');
+	define('_DEV_',1);
 /**
  * CodeIgniter
  *
@@ -54,8 +62,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
-	define('_DEV_',1); //hapus jika bukan Development
+	define('ENVIRONMENT', 'development');
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -129,7 +136,7 @@ switch (ENVIRONMENT)
  *
  * NO TRAILING SLASH!
  */
-	$view_folder = 'views';
+	$view_folder = '';//views';
 
 
 /*
