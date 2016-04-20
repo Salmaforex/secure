@@ -36,6 +36,7 @@ Daftar Fungsi Yang Tersedia :
 			$num=$info=$this->session->flashdata('agent');
 			$this->param['agent']=$num!=''?$num:'';
 		}
+		$this->param['showAgent']=true;
 		$this->param['title']='OPEN LIVE ACCOUNT'; 
 		if(!isset($this->param['formTitle'])) 
 			$this->param['formTitle']=$this->param['title'];
